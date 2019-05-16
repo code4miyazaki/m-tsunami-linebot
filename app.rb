@@ -60,6 +60,13 @@ get '/push' do
 end
 
 post '/webhook' do
+  puts params["replyToken"] # token
+  puts params["type"] # message
+  puts params["source"]["type"] # user
+  puts params["source"]["userId"] # userid
+  puts params["message"]["id"] # id
+  puts params["message"]["type"] # text
+  puts params["message"]["text"] # message
   if params["type"] == "message" && params["message"]["text"].strip == "id"
     url = "#{END_POINT}/reply"
     data = {}
