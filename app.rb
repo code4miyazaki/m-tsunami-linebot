@@ -58,3 +58,28 @@ get '/push' do
   # hashをjson形式で出力
   JSON.dump(json)
 end
+
+post '/webhook' do
+  if params["type"] == "message" && params["message"]["text"].strip == "id"
+    url = "#{END_POINT}/reply"
+    data = {}
+    data["replyToken"] = params["replyToken"]
+    data["messages"] = [create_plaintext(params["source"]["userId"])]
+    res = send_post(url, data)
+
+    # 結果をhashに格納
+    json = {
+      "code": res.code,
+      "message": JSON.parse(res.body)["message"]
+    }
+    # hashをjson形式で出力
+    JSON.dump(json)
+  end
+  # params["replyToken"] # token
+  # params["type"] # message
+  # params["source"]["type"] # user
+  # params["source"]["userId"] # userid
+  # params["message"]["id"] # id
+  # params["message"]["type"] # text
+  # params["message"]["text"] # message
+end
