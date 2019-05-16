@@ -60,33 +60,28 @@ get '/push' do
 end
 
 post '/webhook' do
-  puts params["replyToken"] # token
-  puts params["type"] # message
-  puts params["source"]["type"] # user
-  puts params["source"]["userId"] # userid
-  puts params["message"]["id"] # id
-  puts params["message"]["type"] # text
-  puts params["message"]["text"] # message
-  if params["type"] == "message" && params["message"]["text"].strip == "id"
-    url = "#{END_POINT}/reply"
-    data = {}
-    data["replyToken"] = params["replyToken"]
-    data["messages"] = [create_plaintext(params["source"]["userId"])]
-    res = send_post(url, data)
+  body = request.body.read
+  if body == ''
+    status 400
+  else
+    parsed = JSON.parse(body)["events"][0]
+    # メッセージがidだった場合、メッセージ送信者のuser_idを返す
+    if parsed["type"] == "message" && parsed["message"]["text"].strip == "id"
+      url = "#{END_POINT}/reply"
 
-    # 結果をhashに格納
-    json = {
-      "code": res.code,
-      "message": JSON.parse(res.body)["message"]
-    }
-    # hashをjson形式で出力
-    JSON.dump(json)
+      data = {}
+      data["replyToken"] = parsed["replyToken"]
+      data["messages"] = [create_plaintext(parsed["source"]["userId"])]
+      res = send_post(url, data)
+
+      # 結果をhashに格納
+      json = {
+        "code": res.code,
+        "message": JSON.parse(res.body)["message"]
+      }
+      # hashをjson形式で出力
+      JSON.dump(json)
+    else
+    end
   end
-  # params["replyToken"] # token
-  # params["type"] # message
-  # params["source"]["type"] # user
-  # params["source"]["userId"] # userid
-  # params["message"]["id"] # id
-  # params["message"]["type"] # text
-  # params["message"]["text"] # message
 end
