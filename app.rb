@@ -21,7 +21,7 @@ def send_post(url, data)
 end
 
 # プレーンテキストメッセージ作成
-def create_plaintext(msg)
+def create_msg_plaintext(msg)
   {
     type: 'text',
     text: msg
@@ -38,14 +38,14 @@ get '/push' do
       to = params[:to].split(",")
     else
       url = "#{END_POINT}/push"
-      to = params[:to].split
+      to = params[:to].strip
     end
   end
 
   # post用のdataを作成
   data = {}
   data["to"] = to
-  data["messages"] = [create_plaintext(params[:message])]
+  data["messages"] = [create_msg_plaintext(params[:message])]
 
   # post
   res = send_post(url, data)
