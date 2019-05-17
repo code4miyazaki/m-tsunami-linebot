@@ -39,7 +39,30 @@ get '/push' do
   # post用のdataを作成
   data = {}
   data["to"] = to
-  data["messages"] = [create_msg_plaintext(params[:message])]
+
+  type = params[:type]
+  case type
+  when 'text', nil
+    data["messages"] = [
+      create_msg_plaintext(params[:message])]
+  when 'location'
+    data["messages"] = [
+      create_msg_confirmtmp(params[:title],
+                            params[:address],
+                            params[:lat],
+                            params[:lon])]
+  when 'confirm'
+    data["message"] = [
+      create_msg_confirmtmp(params[:alt_text],
+                            params[:text],
+                            params[:true_text],
+                            params[:false_text])]
+  else
+    return JSON.dump({
+      code: 400,
+      message: "Type '#{type}' is undefined."
+    })
+  end
 
   # post
   res = send_post(url, data)
