@@ -46,8 +46,8 @@ get '/push' do
 
   # 結果をhashに格納
   json = {
-    "code": res.code,
-    "message": JSON.parse(res.body)["message"]
+    code: res.code,
+    message: JSON.parse(res.body)["message"]
   }
   # hashをjson形式で出力
   JSON.dump(json)
@@ -60,21 +60,32 @@ post '/webhook' do
   else
     parsed = JSON.parse(body)["events"][0]
     # メッセージがidだった場合、メッセージ送信者のuser_idを返す
-    if parsed["type"] == "message" && parsed["message"]["text"].strip == "id"
-      url = "#{END_POINT}/reply"
-
-      data = {}
-      data["replyToken"] = parsed["replyToken"]
-      data["messages"] = [create_plaintext(parsed["source"]["userId"])]
-      res = send_post(url, data)
-
-      # 結果をhashに格納
-      json = {
-        "code": res.code,
-        "message": JSON.parse(res.body)["message"]
-      }
-      # hashをjson形式で出力
-      JSON.dump(json)
+    case parsed["type"]
+    when "message"
+      if parsed["message"]["text"].strip == "id"
+        url = "#{END_POINT}/reply"
+  
+        data = {}
+        data["replyToken"] = parsed["replyToken"]
+        data["messages"] = [create_plaintext(parsed["source"]["userId"])]
+        res = send_post(url, data)
+  
+        # 結果をhashに格納
+        json = {
+          code: res.code,
+          message: JSON.parse(res.body)["message"]
+        }
+        # hashをjson形式で出力
+        JSON.dump(json)
+      else
+      end
+    when "follow"
+      # 友達追加
+      # TODO: このアカウントの説明をしたい
+    when "join"
+      # グループ、トークルームに参加
+    when "postback"
+      # リッチテキストのボタン押下イベント等
     else
     end
   end
