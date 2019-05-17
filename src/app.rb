@@ -4,6 +4,8 @@ require 'net/http'
 require 'uri'
 require 'json'
 
+require "#{__dir__}/message_template.rb"
+
 END_POINT = "https://api.line.me/v2/bot/message"
 
 # post送信
@@ -18,14 +20,6 @@ def send_post(url, data)
   return Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
     http.request(request)
   end
-end
-
-# プレーンテキストメッセージ作成
-def create_msg_plaintext(msg)
-  {
-    type: 'text',
-    text: msg
-  }
 end
 
 get '/push' do
