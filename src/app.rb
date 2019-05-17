@@ -22,6 +22,14 @@ def send_post(url, data)
   end
 end
 
+# 画面に出力するJSON文字列を生成
+def return_message(code, msg)
+  JSON.dump({
+    code: code,
+    message: message
+  })
+end
+
 get '/push' do
   # toパラメータの中身に合わせてurl,toを変更
   url = "#{END_POINT}/broadcast"
@@ -58,22 +66,13 @@ get '/push' do
                             params[:true_text],
                             params[:false_text])]
   else
-    return JSON.dump({
-      code: 400,
-      message: "Type '#{type}' is undefined."
-    })
+    return return_message(400, message)
   end
 
   # post
   res = send_post(url, data)
 
-  # 結果をhashに格納
-  json = {
-    code: res.code,
-    message: JSON.parse(res.body)["message"]
-  }
-  # hashをjson形式で出力
-  JSON.dump(json)
+  return return_message(res.code, JSON.parse(res.body)["message"])
 end
 
 post '/webhook' do
@@ -93,13 +92,7 @@ post '/webhook' do
         data["messages"] = [create_plaintext(parsed["source"]["userId"])]
         res = send_post(url, data)
   
-        # 結果をhashに格納
-        json = {
-          code: res.code,
-          message: JSON.parse(res.body)["message"]
-        }
-        # hashをjson形式で出力
-        JSON.dump(json)
+        return return_message(res.code, JSON.parse(res.body)["message"])
       else
       end
     when "follow"
