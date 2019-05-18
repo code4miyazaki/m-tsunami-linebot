@@ -55,7 +55,7 @@ get '/push' do
       create_msg_plaintext(params[:message])]
   when 'location'
     data["messages"] = [
-      create_msg_confirmtmp(params[:title],
+      create_msg_location(params[:title],
                             params[:address],
                             params[:lat],
                             params[:lon])]
